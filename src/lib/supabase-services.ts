@@ -1,5 +1,6 @@
 import { getSupabaseClient, isSupabaseConfigured } from './supabase';
 import type { Tiger, Elephant, Conflict, Sighting, FilterParams, Stats, StripeIdentificationResult } from '@/types';
+import { getMockElephants } from './mock-elephants';
 
 // ============================================================================
 // TIGER SERVICES
@@ -73,6 +74,30 @@ export const getTigerById = async (id: string): Promise<Tiger | null> => {
 // ELEPHANT SERVICES
 // ============================================================================
 
+export const getElephantById = async (id: string): Promise<Elephant | null> => {
+  if (!isSupabaseConfigured()) {
+    return getMockElephants().find(e => e.id === id) || null;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return getMockElephants().find(e => e.id === id) || null;
+    }
+    const { data, error } = await supabase
+      .from('elephants')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching elephant:', error);
+    return null;
+  }
+};
+
 export const getElephants = async (filters?: FilterParams): Promise<Elephant[]> => {
   if (!isSupabaseConfigured()) {
     return getMockElephants();
@@ -108,30 +133,6 @@ export const getElephants = async (filters?: FilterParams): Promise<Elephant[]> 
   } catch (error) {
     console.error('Error fetching elephants:', error);
     return getMockElephants();
-  }
-};
-
-export const getElephantById = async (id: string): Promise<Elephant | null> => {
-  if (!isSupabaseConfigured()) {
-    return getMockElephants().find(e => e.id === id) || null;
-  }
-
-  try {
-    const supabase = getSupabaseClient();
-    if (!supabase) {
-      return getMockElephants().find(e => e.id === id) || null;
-    }
-    const { data, error } = await supabase
-      .from('elephants')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error fetching elephant:', error);
-    return null;
   }
 };
 
@@ -612,14 +613,14 @@ const getMockConflicts = (): Conflict[] => [
 const getMockSightings = (): Sighting[] => [
   {
     id: 'SIGHT-001',
-    animal_id: 'KA-BNR-F24',
+    animal_id: 'IN-MP-045',
     species: 'Tiger',
-    name: 'Lakshmi',
-    location: 'Bandipur',
-    reserve: 'Bandipur National Park',
-    coordinates: '11.6898°N, 76.7012°E',
-    latitude: 11.6898,
-    longitude: 76.7012,
+    name: 'Collarwali',
+    location: 'Pench Tiger Reserve',
+    reserve: 'Pench Tiger Reserve',
+    coordinates: '21.7679° N, 79.2961° E',
+    latitude: 21.7679,
+    longitude: 79.2961,
     sex: 'Female',
     age: 'Adult',
     status: 'Collared',
@@ -627,32 +628,32 @@ const getMockSightings = (): Sighting[] => [
   },
   {
     id: 'SIGHT-002',
-    animal_id: 'KA-BRT-F19',
+    animal_id: 'IN-RJ-012',
     species: 'Tiger',
-    name: null,
-    location: 'BRT Wildlife Sanctuary',
-    reserve: 'BRT Wildlife Sanctuary',
-    coordinates: '12.0833°N, 77.2308°E',
-    latitude: 12.0833,
-    longitude: 77.2308,
-    sex: 'Female',
+    name: 'T-91',
+    location: 'Ranthambore',
+    reserve: 'Ranthambore',
+    coordinates: '26.0173° N, 76.5026° E',
+    latitude: 26.0173,
+    longitude: 76.5026,
+    sex: 'Male',
     age: 'Adult',
     status: 'Collared',
     sighted_at: new Date().toISOString(),
   },
   {
     id: 'SIGHT-003',
-    animal_id: 'KA-BHD-F12',
+    animal_id: 'IN-KA-078',
     species: 'Tiger',
-    name: 'Bhima',
-    location: 'Bhadra',
-    reserve: 'Bhadra Wildlife Sanctuary',
-    coordinates: '13.4931°N, 75.6584°E',
-    latitude: 13.4931,
-    longitude: 75.6584,
+    name: 'Bandipur Male',
+    location: 'Bandipur National Park',
+    reserve: 'Bandipur National Park',
+    coordinates: '11.6643° N, 76.6862° E',
+    latitude: 11.6643,
+    longitude: 76.6862,
     sex: 'Male',
     age: 'Sub-adult',
-    status: 'Collared',
+    status: 'Uncollared',
     sighted_at: new Date().toISOString(),
   },
 ];

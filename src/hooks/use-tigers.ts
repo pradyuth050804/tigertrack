@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getTigers, getTigerById } from '@/lib/supabase-services';
+import { getTigers, getTigerById } from '@/lib/animal-services';
 import type { Tiger, FilterParams } from '@/types';
 
 export const useTigers = (filters?: FilterParams) => {

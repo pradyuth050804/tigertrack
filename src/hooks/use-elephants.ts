@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getElephants, getElephantById } from '@/lib/supabase-services';
+import { getElephants, getElephantById } from '@/lib/animal-services';
 import type { Elephant, FilterParams } from '@/types';
 
 export const useElephants = (filters?: FilterParams) => {

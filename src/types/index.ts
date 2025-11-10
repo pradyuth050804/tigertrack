@@ -43,6 +43,11 @@ export interface Elephant {
   signal: 'Strong' | 'Medium' | 'Weak' | null;
   last_transmission: string | null;
   status: 'Active' | 'Inactive' | 'Missing';
+  coordinates: string;
+  weight: number | null;
+  health_status: string | null;
+  last_seen: string;
+  conflicts: number;
   created_at?: string;
   updated_at?: string;
 }

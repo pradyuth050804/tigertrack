@@ -60,7 +60,8 @@ const Dashboard = () => {
 
   // Transform sightings data for display
   const recentSightings = sightingsData?.map(sighting => ({
-    id: sighting.animal_id,
+    id: sighting.id,
+    animal_id: sighting.animal_id,
     name: sighting.name,
     location: sighting.location,
     coordinates: sighting.coordinates,
@@ -252,7 +253,11 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recentSightings.map((sighting) => (
-            <Card key={sighting.id} className="border border-border shadow-sm hover:shadow-md transition-shadow">
+            <Card 
+              key={sighting.id} 
+              className="border border-border shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => navigate(`/tigers/${sighting.animal_id}`)}
+            >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>

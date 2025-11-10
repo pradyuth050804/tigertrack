@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, Search, Download, Eye, Edit, Trash2, MapPin, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Eye, Plus, Search, Download, MapPin, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ import { useTigers } from "@/hooks/use-tigers";
 import type { FilterParams } from "@/types";
 
 const Tigers = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<FilterParams>({});
   
@@ -112,11 +114,16 @@ const Tigers = () => {
                 </TableRow>
               ) : (
                 tigerData.map((tiger) => (
-                <TableRow 
-                  key={tiger.id} 
-                  className="hover:bg-muted/30"
-                >
-                <TableCell className="font-mono font-medium">{tiger.id}</TableCell>
+                  <TableRow 
+                    key={tiger.id} 
+                    onClick={(e) => {
+                      const el = e.target as HTMLElement | null;
+                      if (el && el.closest && el.closest('button, a, [role="button"], [data-no-row-click]')) return;
+                      navigate(`/tigers/${tiger.id}`);
+                    }}
+                    className="hover:bg-muted/30 cursor-pointer transition-colors"
+                  >
+                  <TableCell className="font-mono font-medium">{tiger.id}</TableCell>
                 <TableCell className="font-medium">{tiger.name || "-"}</TableCell>
                 <TableCell>
                   <div className="text-sm">
@@ -175,16 +182,25 @@ const Tigers = () => {
                 </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        data-no-row-click
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <MapPin className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Edit className="h-4 w-4" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        data-no-row-click
+                        onClick={(e) => { e.stopPropagation(); navigate(`/tigers/${tiger.id}`); }}
+                      >
+                        <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" data-no-row-click onClick={(e) => e.stopPropagation()}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
