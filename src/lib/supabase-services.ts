@@ -642,88 +642,58 @@ export const createElephant = async (
 };
 
 // -------------------------
-// OTP / Auth helpers
+// Email/Password Auth helpers
 // -------------------------
-/**
- * sendOtp: sends an OTP to the provided email. When Supabase isn't
- * configured this will store a mock code in localStorage and log it
- * to the console so testing is easy in development.
- */
-export const sendOtp = async (email: string): Promise<boolean> => {
-  const mockKey = `mock_otp_${email}`;
-  if (!isSupabaseConfigured()) {
-    const code = String(Math.floor(100000 + Math.random() * 900000));
-    const payload = { code, expiresAt: Date.now() + 5 * 60 * 1000 };
-    try {
-      localStorage.setItem(mockKey, JSON.stringify(payload));
-    } catch (e) {
-      console.warn('Unable to persist mock OTP', e);
-    }
-    // For developer convenience, print the code in the console
-    // (remove in production)
-    // eslint-disable-next-line no-console
-    console.info(`[mock-otp] sent to ${email}: ${code}`);
-    return true;
-  }
 
-  try {
-    const supabase = getSupabaseClient();
-    if (!supabase) return false;
-    // Prefer an Edge function named `send-otp` if available
-    if (supabase.functions && supabase.functions.invoke) {
-      const { error } = await supabase.functions.invoke('send-otp', { body: { email } });
-      if (error) throw error;
-      return true;
-    }
-
-    // Fallback to Supabase auth magic link (not exactly OTP, but usable)
-    await supabase.auth.signInWithOtp({ email });
-    return true;
-  } catch (error) {
-    console.error('sendOtp error', error);
-    return false;
-  }
-};
+// Mock users database
+const MOCK_USERS = [
+  { email: 'pradyuthurs@gmail.com', password: 'Pradyuth', role: 'administrator' as const },
+  { email: 'user@tigertrack.local', password: 'password123', role: 'user' as const },
+  { email: 'test@example.com', password: 'test123', role: 'user' as const },
+];
 
 /**
- * verifyOtp: verifies a given code for an email. For mock flow it reads
- * the code stored in localStorage.
+ * authenticateUser: verifies email and password. When Supabase isn't
+ * configured, uses mock users database. Returns success status and role.
  */
-export const verifyOtp = async (email: string, code: string): Promise<{ success: boolean; role?: string; }> => {
-  const mockKey = `mock_otp_${email}`;
+export const authenticateUser = async (
+  email: string,
+  password: string
+): Promise<{ success: boolean; role?: 'administrator' | 'user' }> => {
   if (!isSupabaseConfigured()) {
-    try {
-      const raw = localStorage.getItem(mockKey);
-      if (!raw) return { success: false };
-      const payload = JSON.parse(raw) as { code: string; expiresAt: number };
-      if (Date.now() > payload.expiresAt) return { success: false };
-      if (payload.code === code) {
-        // Check if a role was previously stored for this email
-        const storedRole = localStorage.getItem(`role_${email}`) || undefined;
-        return { success: true, role: storedRole };
-      }
-      return { success: false };
-    } catch (e) {
-      console.error('verifyOtp mock error', e);
-      return { success: false };
+    const user = MOCK_USERS.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    );
+    if (user) {
+      return { success: true, role: user.role };
     }
-  }
-
-  try {
-    const supabase = getSupabaseClient();
-    if (!supabase) return { success: false };
-    // If an Edge function exists, call verify-otp
-    if (supabase.functions && supabase.functions.invoke) {
-      const { data, error } = await supabase.functions.invoke('verify-otp', { body: { email, code } });
-      if (error) throw error;
-      return { success: !!data?.verified, role: data?.role };
-    }
-
-    // Supabase JS doesn't provide a simple code verify for email OTP by default
-    // so we fallback to attempting a signIn with OTP (magic link) - not ideal.
     return { success: false };
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      // Fallback to mock if no supabase
+      const user = MOCK_USERS.find(
+        (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      );
+      return user ? { success: true, role: user.role } : { success: false };
+    }
+
+    // Attempt Supabase auth signInWithPassword
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+
+    // Fetch user role from users table
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('email', email)
+      .single();
+
+    return { success: !!data, role: (userData?.role as 'administrator' | 'user') || 'user' };
   } catch (error) {
-    console.error('verifyOtp error', error);
+    console.error('authenticateUser error', error);
     return { success: false };
   }
 };

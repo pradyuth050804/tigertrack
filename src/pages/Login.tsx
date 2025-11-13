@@ -5,76 +5,131 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const { sendOtpToEmail, verifyCode, setRoleForUser } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
-  const [stage, setStage] = useState<'enter' | 'verify' | 'chooseRole'>('enter');
-  const [code, setCode] = useState('');
-  const [message, setMessage] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSend = async () => {
-    setMessage('');
-    if (!email) return setMessage('Enter an email');
-    const ok = await sendOtpToEmail(email);
-    if (ok) {
-      setStage('verify');
-      setMessage('OTP sent. Check console (dev) or your email.');
-    } else setMessage('Unable to send OTP');
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
 
-  const handleVerify = async () => {
-    setMessage('');
-    const res = await verifyCode(email, code);
-    if (res.success) {
-      // If role exists, redirect; otherwise ask to choose
-      if (res.role) {
+    setIsLoading(true);
+    try {
+      const result = await login(email, password);
+      if (result.success) {
         navigate('/tigers');
       } else {
-        setStage('chooseRole');
+        setError(result.error || 'Login failed');
       }
-    } else {
-      setMessage('Invalid or expired code');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const finishRole = (role: 'administrator' | 'user') => {
-    setRoleForUser(email, role);
-    navigate('/tigers');
-  };
-
   return (
-    <div className="max-w-md mx-auto py-24">
-      <h1 className="text-2xl font-bold mb-4">Sign in</h1>
-      {stage === 'enter' && (
-        <div className="space-y-3">
-          <Input placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Button onClick={handleSend} className="w-full">Send OTP</Button>
-          {message && <div className="text-sm text-muted-foreground">{message}</div>}
-        </div>
-      )}
-
-      {stage === 'verify' && (
-        <div className="space-y-3">
-          <div className="text-sm text-muted-foreground">Enter the 6-digit code sent to {email}</div>
-          <Input placeholder="123456" value={code} onChange={(e) => setCode(e.target.value)} />
-          <Button onClick={handleVerify} className="w-full">Verify</Button>
-          <div className="flex justify-between">
-            <Button variant="link" onClick={() => setStage('enter')}>Change email</Button>
-            <Button variant="ghost" onClick={handleSend}>Resend OTP</Button>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo / Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xl">🐯</span>
+            </div>
           </div>
-          {message && <div className="text-sm text-destructive">{message}</div>}
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">TigerTrack</h1>
+          <p className="text-gray-600">Wildlife Conservation Dashboard</p>
         </div>
-      )}
 
-      {stage === 'chooseRole' && (
-        <div className="space-y-3">
-          <div className="text-sm text-muted-foreground">Choose your role</div>
-          <div className="flex gap-2">
-            <Button onClick={() => finishRole('user')} className="flex-1">User</Button>
-            <Button onClick={() => finishRole('administrator')} className="flex-1">Administrator</Button>
+        {/* Login Card */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Input */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-3">
+                <div className="text-red-600 text-sm font-medium">{error}</div>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </Button>
+          </form>
+
+          {/* Demo Credentials */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-600 text-center mb-3">Demo Credentials</p>
+            <div className="space-y-2 text-xs text-gray-600">
+              <div className="bg-gray-50 p-3 rounded">
+                <p className="font-medium text-gray-700 mb-1">Admin:</p>
+                <p>Email: <code className="text-orange-600">pradyuthurs@gmail.com</code></p>
+                <p>Password: <code className="text-orange-600">Pradyuth</code></p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded">
+                <p className="font-medium text-gray-700 mb-1">User:</p>
+                <p>Email: <code className="text-green-600">user@tigertrack.local</code></p>
+                <p>Password: <code className="text-green-600">password123</code></p>
+              </div>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-600 mt-6">
+          © 2025 TigerTrack. All rights reserved.
+        </p>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { sendOtp, verifyOtp, getUserRole } from '@/lib/supabase-services';
+import { authenticateUser, getUserRole } from '@/lib/supabase-services';
 
 type User = {
   email: string;
@@ -9,8 +9,7 @@ type User = {
 type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
-  sendOtpToEmail: (email: string) => Promise<boolean>;
-  verifyCode: (email: string, code: string) => Promise<{ success: boolean; role?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   setRoleForUser: (email: string, role: User['role']) => void;
   logout: () => void;
 };
@@ -36,32 +35,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const sendOtpToEmail = async (email: string) => {
-    return await sendOtp(email);
-  };
+  const login = async (email: string, password: string) => {
+    try {
+      const res = await authenticateUser(email, password);
+      if (res.success) {
+        // Try to fetch role from users table if not returned
+        let role = res.role;
+        if (!role) {
+          role = await getUserRole(email);
+        }
+        if (!role) role = 'user';
 
-  const verifyCode = async (email: string, code: string) => {
-    const res = await verifyOtp(email, code);
-    if (res.success) {
-      // Try to fetch role from users table/Supabase
-      let role = (res.role as User['role']) || (localStorage.getItem(`role_${email}`) as User['role'] | null);
-      if (!role) {
-        role = await getUserRole(email);
+        const u: User = { email, role };
+        setUser(u);
+        if (role) localStorage.setItem(`role_${email}`, role);
+        return { success: true };
+      } else {
+        return { success: false, error: 'Invalid email or password' };
       }
-      if (!role) role = 'user'; // Default to 'user' if no role found
-
-      const u: User = { email, role };
-      setUser(u);
-      if (role) localStorage.setItem(`role_${email}`, role);
-      return { success: true, role };
+    } catch (err) {
+      console.error('Login error', err);
+      return { success: false, error: 'Login failed. Please try again.' };
     }
-    return { success: false };
   };
 
   const setRoleForUser = (email: string, role: User['role']) => {
     try {
       localStorage.setItem(`role_${email}`, role);
-      // if currently logged in user matches, update
       setUser((prev) => (prev && prev.email === email ? { ...prev, role } : prev));
     } catch (e) {
       console.warn('Could not persist role', e);
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, sendOtpToEmail, verifyCode, setRoleForUser, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, setRoleForUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
