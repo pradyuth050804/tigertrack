@@ -432,6 +432,116 @@ export const identifyTiger = async (
   }
 };
 
+// Create a new tiger record. Generates an ID like IN-<STATE>-<NNN> by
+// scanning existing tiger IDs for that state and incrementing the max.
+export const createTiger = async (
+  name: string,
+  stateCode: string = 'MP',
+  leftFlankImage?: File | null,
+  rightFlankImage?: File | null
+): Promise<Tiger | null> => {
+  // When Supabase isn't configured return a mock object
+  if (!isSupabaseConfigured()) {
+    const generatedId = `IN-${stateCode}-${String(Math.floor(Date.now() % 1000)).padStart(3, '0')}`;
+    return {
+      id: generatedId,
+      name,
+      sex: 'Unknown',
+      age_class: 'Unknown',
+      state: stateCode,
+      district: '',
+      reserve: '',
+      stripe_match_id: null,
+      confidence: null,
+      image_count: (leftFlankImage || rightFlankImage) ? 2 : 0,
+      last_seen: null,
+      status: 'Unknown',
+      collared: false,
+      collar_id: null,
+      battery: null,
+      signal: null,
+      conflicts: 0,
+      coordinates: null,
+      latitude: null,
+      longitude: null,
+    } as unknown as Tiger;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) return null;
+
+    // Find existing IDs for this state code and compute next number
+    const likePattern = `IN-${stateCode}-%`;
+    const { data: existingIds, error: fetchError } = await supabase
+      .from('tigers')
+      .select('id')
+      .like('id', likePattern);
+
+    if (fetchError) throw fetchError;
+
+    let nextNumber = 1;
+    if (existingIds && existingIds.length > 0) {
+      const nums = existingIds
+        .map((r: any) => {
+          const parts = (r.id || '').split('-');
+          const num = parts[2] ? parseInt(parts[2], 10) : NaN;
+          return Number.isFinite(num) ? num : null;
+        })
+        .filter((n: number | null) => n !== null) as number[];
+      if (nums.length > 0) {
+        nextNumber = Math.max(...nums) + 1;
+      }
+    }
+
+    const generatedId = `IN-${stateCode}-${String(nextNumber).padStart(3, '0')}`;
+
+    // Helper to upload an image and return public URL (if provided)
+    const uploadImage = async (file?: File | null, side?: string) => {
+      if (!file) return null;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${side || 'img'}-${Date.now()}-${Math.random()}.${fileExt}`;
+      const filePath = `tigers/${generatedId}/${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('tiger-images')
+        .upload(filePath, file);
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        return null;
+      }
+      const { data: { publicUrl } } = supabase.storage.from('tiger-images').getPublicUrl(filePath);
+      return publicUrl;
+    };
+
+    const [leftUrl, rightUrl] = await Promise.all([
+      uploadImage(leftFlankImage, 'left'),
+      uploadImage(rightFlankImage, 'right'),
+    ]);
+
+    const insertPayload: any = {
+      id: generatedId,
+      name,
+      state: stateCode,
+      image_count: (leftUrl || rightUrl) ? 2 : 0,
+      left_image_url: leftUrl || null,
+      right_image_url: rightUrl || null,
+      created_at: new Date().toISOString(),
+    };
+
+    const { data: inserted, error: insertError } = await supabase
+      .from('tigers')
+      .insert([insertPayload])
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+    return inserted as Tiger;
+  } catch (error) {
+    console.error('Error creating tiger:', error);
+    return null;
+  }
+};
+
 // ============================================================================
 // MOCK DATA (Fallback when Supabase is not configured)
 // ============================================================================
