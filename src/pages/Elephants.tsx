@@ -42,7 +42,7 @@ const Elephants = () => {
           <h1 className="text-3xl font-bold tracking-tight mb-2">Elephant Records</h1>
           <p className="text-muted-foreground">Comprehensive tracking of all elephants across India</p>
         </div>
-        <Button className="gradient-elephant">
+        <Button className="gradient-elephant" onClick={() => navigate('/add-new-elephant')}>
           <Plus className="h-4 w-4 mr-2" />
           Add New Elephant
         </Button>

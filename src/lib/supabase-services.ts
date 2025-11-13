@@ -542,6 +542,105 @@ export const createTiger = async (
   }
 };
 
+// Create a new elephant record. Similar to createTiger but inserts into elephants table.
+export const createElephant = async (
+  name: string,
+  stateCode: string = 'KA',
+  leftImage?: File | null,
+  rightImage?: File | null
+): Promise<Elephant | null> => {
+  if (!isSupabaseConfigured()) {
+    const generatedId = `IN-${stateCode}-${String(Math.floor(Date.now() % 1000)).padStart(3, '0')}`;
+    return {
+      id: generatedId,
+      name,
+      sex: 'Unknown',
+      age_class: 'Unknown',
+      state: stateCode,
+      district: '',
+      reserve: '',
+      collared: false,
+      collar_id: null,
+      last_location: null,
+      latitude: null,
+      longitude: null,
+      movement_distance: null,
+      battery: null,
+      signal: null,
+      last_transmission: null,
+      status: 'Unknown',
+    } as unknown as Elephant;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) return null;
+
+    const likePattern = `IN-${stateCode}-%`;
+    const { data: existingIds, error: fetchError } = await supabase
+      .from('elephants')
+      .select('id')
+      .like('id', likePattern);
+
+    if (fetchError) throw fetchError;
+
+    let nextNumber = 1;
+    if (existingIds && existingIds.length > 0) {
+      const nums = existingIds
+        .map((r: any) => {
+          const parts = (r.id || '').split('-');
+          const num = parts[2] ? parseInt(parts[2], 10) : NaN;
+          return Number.isFinite(num) ? num : null;
+        })
+        .filter((n: number | null) => n !== null) as number[];
+      if (nums.length > 0) nextNumber = Math.max(...nums) + 1;
+    }
+
+    const generatedId = `IN-${stateCode}-${String(nextNumber).padStart(3, '0')}`;
+
+    const uploadImage = async (file?: File | null, side?: string) => {
+      if (!file) return null;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${side || 'img'}-${Date.now()}-${Math.random()}.${fileExt}`;
+      const filePath = `elephants/${generatedId}/${fileName}`;
+      const { error: uploadError } = await supabase.storage.from('tiger-images').upload(filePath, file);
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        return null;
+      }
+      const { data: { publicUrl } } = supabase.storage.from('tiger-images').getPublicUrl(filePath);
+      return publicUrl;
+    };
+
+    const [leftUrl, rightUrl] = await Promise.all([
+      uploadImage(leftImage, 'left'),
+      uploadImage(rightImage, 'right'),
+    ]);
+
+    const insertPayload: any = {
+      id: generatedId,
+      name,
+      state: stateCode,
+      image_count: (leftUrl || rightUrl) ? 2 : 0,
+      left_image_url: leftUrl || null,
+      right_image_url: rightUrl || null,
+      created_at: new Date().toISOString(),
+    };
+
+    const { data: inserted, error: insertError } = await supabase
+      .from('elephants')
+      .insert([insertPayload])
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+    return inserted as Elephant;
+  } catch (error) {
+    console.error('Error creating elephant:', error);
+    return null;
+  }
+};
+
 // ============================================================================
 // MOCK DATA (Fallback when Supabase is not configured)
 // ============================================================================
