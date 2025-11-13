@@ -728,6 +728,51 @@ export const verifyOtp = async (email: string, code: string): Promise<{ success:
   }
 };
 
+/**
+ * getUserRole: fetches the role for a given email from a mock users table
+ * or from a Supabase users table. Returns 'administrator' | 'user' or undefined if not found.
+ */
+export const getUserRole = async (email: string): Promise<'administrator' | 'user' | undefined> => {
+  const mockUsers = [
+    { email: 'admin@tigertrack.local', role: 'administrator' as const },
+    { email: 'user@tigertrack.local', role: 'user' as const },
+    { email: 'test@example.com', role: 'user' as const },
+  ];
+
+  if (!isSupabaseConfigured()) {
+    const mockUser = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    return mockUser?.role;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      const mockUser = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+      return mockUser?.role;
+    }
+
+    // Try to fetch from users table
+    const { data: userData, error } = await supabase
+      .from('users')
+      .select('role')
+      .eq('email', email)
+      .single();
+
+    if (error) {
+      console.warn('Error fetching user role:', error);
+      // Fallback to mock if table doesn't exist or other error
+      const mockUser = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+      return mockUser?.role;
+    }
+
+    return userData && (userData.role as 'administrator' | 'user' | undefined);
+  } catch (error) {
+    console.error('getUserRole error:', error);
+    const mockUser = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    return mockUser?.role;
+  }
+};
+
 // ============================================================================
 // MOCK DATA (Fallback when Supabase is not configured)
 // ============================================================================

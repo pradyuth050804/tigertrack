@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { sendOtp, verifyOtp } from '@/lib/supabase-services';
+import { sendOtp, verifyOtp, getUserRole } from '@/lib/supabase-services';
 
 type User = {
   email: string;
@@ -43,9 +43,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const verifyCode = async (email: string, code: string) => {
     const res = await verifyOtp(email, code);
     if (res.success) {
-      const role = (res.role as User['role']) || (localStorage.getItem(`role_${email}`) as User['role'] | null) || 'user';
+      // Try to fetch role from users table/Supabase
+      let role = (res.role as User['role']) || (localStorage.getItem(`role_${email}`) as User['role'] | null);
+      if (!role) {
+        role = await getUserRole(email);
+      }
+      if (!role) role = 'user'; // Default to 'user' if no role found
+
       const u: User = { email, role };
       setUser(u);
+      if (role) localStorage.setItem(`role_${email}`, role);
       return { success: true, role };
     }
     return { success: false };
