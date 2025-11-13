@@ -641,6 +641,93 @@ export const createElephant = async (
   }
 };
 
+// -------------------------
+// OTP / Auth helpers
+// -------------------------
+/**
+ * sendOtp: sends an OTP to the provided email. When Supabase isn't
+ * configured this will store a mock code in localStorage and log it
+ * to the console so testing is easy in development.
+ */
+export const sendOtp = async (email: string): Promise<boolean> => {
+  const mockKey = `mock_otp_${email}`;
+  if (!isSupabaseConfigured()) {
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const payload = { code, expiresAt: Date.now() + 5 * 60 * 1000 };
+    try {
+      localStorage.setItem(mockKey, JSON.stringify(payload));
+    } catch (e) {
+      console.warn('Unable to persist mock OTP', e);
+    }
+    // For developer convenience, print the code in the console
+    // (remove in production)
+    // eslint-disable-next-line no-console
+    console.info(`[mock-otp] sent to ${email}: ${code}`);
+    return true;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) return false;
+    // Prefer an Edge function named `send-otp` if available
+    if (supabase.functions && supabase.functions.invoke) {
+      const { error } = await supabase.functions.invoke('send-otp', { body: { email } });
+      if (error) throw error;
+      return true;
+    }
+
+    // Fallback to Supabase auth magic link (not exactly OTP, but usable)
+    await supabase.auth.signInWithOtp({ email });
+    return true;
+  } catch (error) {
+    console.error('sendOtp error', error);
+    return false;
+  }
+};
+
+/**
+ * verifyOtp: verifies a given code for an email. For mock flow it reads
+ * the code stored in localStorage.
+ */
+export const verifyOtp = async (email: string, code: string): Promise<{ success: boolean; role?: string; }> => {
+  const mockKey = `mock_otp_${email}`;
+  if (!isSupabaseConfigured()) {
+    try {
+      const raw = localStorage.getItem(mockKey);
+      if (!raw) return { success: false };
+      const payload = JSON.parse(raw) as { code: string; expiresAt: number };
+      if (Date.now() > payload.expiresAt) return { success: false };
+      if (payload.code === code) {
+        // Check if a role was previously stored for this email
+        const storedRole = localStorage.getItem(`role_${email}`) || undefined;
+        return { success: true, role: storedRole };
+      }
+      return { success: false };
+    } catch (e) {
+      console.error('verifyOtp mock error', e);
+      return { success: false };
+    }
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) return { success: false };
+    // If an Edge function exists, call verify-otp
+    if (supabase.functions && supabase.functions.invoke) {
+      const { data, error } = await supabase.functions.invoke('verify-otp', { body: { email, code } });
+      if (error) throw error;
+      return { success: !!data?.verified, role: data?.role };
+    }
+
+    // Supabase JS doesn't provide a simple code verify for email OTP by default
+    // so we fallback to attempting a signIn with OTP (magic link) - not ideal.
+    return { success: false };
+  } catch (error) {
+    console.error('verifyOtp error', error);
+    return { success: false };
+  }
+};
+
 // ============================================================================
 // MOCK DATA (Fallback when Supabase is not configured)
 // ============================================================================

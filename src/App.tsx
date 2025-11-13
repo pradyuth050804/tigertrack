@@ -19,6 +19,10 @@ import AddNewElephant from "./pages/AddNewElephant";
 import TigerProfile from "./pages/TigerProfile";
 import ElephantProfile from "./pages/ElephantProfile";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/AuthContext";
+import React from "react";
+
 
 const queryClient = new QueryClient();
 
@@ -32,12 +36,14 @@ const App = () => {
 
   return (
   <QueryClientProvider client={queryClient}>
+    <AuthProvider>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/login" element={<Login />} />
             <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/tigers" element={<Tigers />} />
@@ -57,6 +63,7 @@ const App = () => {
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
+    </AuthProvider>
   </QueryClientProvider>
   );
 };
