@@ -14,6 +14,7 @@ import Analytics from "./pages/Analytics";
 import Conflicts from "./pages/Conflicts";
 import Settings from "./pages/Settings";
 import StripeIdentification from "./pages/StripeIdentification";
+import IdentifyNewTiger from "./pages/IdentifyNewTiger";
 import TigerProfile from "./pages/TigerProfile";
 import ElephantProfile from "./pages/ElephantProfile";
 import NotFound from "./pages/NotFound";
@@ -44,6 +45,7 @@ const App = () => {
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/conflicts" element={<Conflicts />} />
               <Route path="/stripe-identification" element={<StripeIdentification />} />
+              <Route path="/identify-new-tiger" element={<IdentifyNewTiger />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/tigers/:id" element={<TigerProfile />} />
               <Route path="/elephants/:id" element={<ElephantProfile />} />

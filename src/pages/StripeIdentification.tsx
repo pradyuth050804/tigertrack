@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { identifyTiger, createTiger } from "@/lib/supabase-services";
-import { useNavigate } from 'react-router-dom';
+import { identifyTiger } from "@/lib/supabase-services";
 
 const StripeIdentification = () => {
   const [leftFlankImage, setLeftFlankImage] = useState<File | null>(null);
@@ -16,10 +15,6 @@ const StripeIdentification = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<any>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [newName, setNewName] = useState<string>("");
-  const [newStateCode, setNewStateCode] = useState<string>("MP");
-  const [isCreating, setIsCreating] = useState(false);
 
   const handleFileSelect = (file: File | null, side: 'left' | 'right') => {
     if (!file) return;
@@ -90,30 +85,6 @@ const StripeIdentification = () => {
       console.error("Stripe analysis error:", error);
     } finally {
       setIsAnalyzing(false);
-    }
-  };
-
-  const handleCreateTiger = async () => {
-    if (!newName) {
-      toast({ title: 'Name required', description: 'Please provide a name for the new tiger', variant: 'destructive' });
-      return;
-    }
-
-    setIsCreating(true);
-    try {
-      const created = await createTiger(newName, newStateCode, leftFlankImage, rightFlankImage);
-      if (created) {
-        toast({ title: 'Tiger created', description: `Created ${created.id}` });
-        // Navigate to profile if route exists
-        navigate(`/tigers/${created.id}`);
-      } else {
-        throw new Error('Create failed');
-      }
-    } catch (err) {
-      console.error('Create tiger error', err);
-      toast({ title: 'Creation failed', description: 'Unable to create tiger', variant: 'destructive' });
-    } finally {
-      setIsCreating(false);
     }
   };
 
@@ -217,33 +188,6 @@ const StripeIdentification = () => {
               </>
             )}
           </Button>
-          <div className="mt-4 space-y-2">
-            <label className="text-sm font-medium">Assign Name</label>
-            <input
-              type="text"
-              placeholder="e.g. T-92 or Collarwali"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="w-full rounded-md border border-border px-3 py-2"
-            />
-
-            <label className="text-sm font-medium">State Code (2 letters)</label>
-            <input
-              type="text"
-              value={newStateCode}
-              onChange={(e) => setNewStateCode(e.target.value.toUpperCase())}
-              maxLength={2}
-              className="w-28 rounded-md border border-border px-3 py-2"
-            />
-
-            <Button
-              onClick={handleCreateTiger}
-              disabled={isCreating}
-              className="w-full mt-2"
-            >
-              {isCreating ? 'Creating...' : 'Create New Tiger'}
-            </Button>
-          </div>
         </Card>
 
         <Card className="p-6">

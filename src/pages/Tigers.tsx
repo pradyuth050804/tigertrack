@@ -52,7 +52,7 @@ const Tigers = () => {
           <h1 className="text-3xl font-bold tracking-tight mb-2">Tiger Records</h1>
           <p className="text-muted-foreground">Comprehensive tracking of all tigers across India</p>
         </div>
-        <Button className="gradient-tiger" onClick={() => navigate('/stripe-identification')}>
+        <Button className="gradient-tiger" onClick={() => navigate('/identify-new-tiger')}>
           <Plus className="h-4 w-4 mr-2" />
           Identify New Tiger
         </Button>
