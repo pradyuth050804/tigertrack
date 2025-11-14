@@ -1,11 +1,14 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { Moon, Sun, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
+import { useAuth } from '@/contexts/AuthContext';
 
 const Layout = () => {
   const { theme, setTheme } = useTheme();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,6 +46,24 @@ const Layout = () => {
               ) : (
                 <Moon className="h-5 w-5" />
               )}
+            </Button>
+            
+            {/* Logout button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                try {
+                  logout();
+                  navigate('/login');
+                } catch (e) {
+                  // fallback: clear localStorage and reload
+                  localStorage.removeItem('auth_user');
+                  window.location.href = '/login';
+                }
+              }}
+            >
+              Logout
             </Button>
           </div>
         </div>

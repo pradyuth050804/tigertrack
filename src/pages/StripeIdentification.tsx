@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { identifyTiger } from "@/lib/supabase-services";
+import { useAuth } from '@/contexts/AuthContext';
 
 const StripeIdentification = () => {
   const [leftFlankImage, setLeftFlankImage] = useState<File | null>(null);
@@ -15,6 +16,7 @@ const StripeIdentification = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<any>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleFileSelect = (file: File | null, side: 'left' | 'right') => {
     if (!file) return;
@@ -64,8 +66,8 @@ const StripeIdentification = () => {
     setIsAnalyzing(true);
     
     try {
-      // Send both images to the backend for identification
-      const result = await identifyTiger(leftFlankImage, rightFlankImage);
+  // Send both images to the backend for identification
+  const result = await identifyTiger(leftFlankImage, rightFlankImage, user?.role);
       
       if (result) {
         setResults(result);

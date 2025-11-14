@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { createTiger } from "@/lib/supabase-services";
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const IdentifyNewTiger = () => {
@@ -17,6 +18,7 @@ const IdentifyNewTiger = () => {
   const [stateCode, setStateCode] = useState<string>("MP");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleFileSelect = (file: File | null, side: 'left' | 'right') => {
     if (!file) return;
@@ -54,7 +56,7 @@ const IdentifyNewTiger = () => {
     }
     setIsCreating(true);
     try {
-      const created = await createTiger(name, stateCode, leftFlankImage, rightFlankImage);
+  const created = await createTiger(name, stateCode, leftFlankImage, rightFlankImage, user?.role);
       if (created) {
         toast({ title: 'Tiger created', description: `Created ${created.id}` });
         navigate(`/tigers/${created.id}`);

@@ -355,8 +355,13 @@ export const getStats = async (): Promise<Stats> => {
 
 export const identifyTiger = async (
   leftFlankImage: File,
-  rightFlankImage: File
+  rightFlankImage: File,
+  callerRole?: 'administrator' | 'user'
 ): Promise<StripeIdentificationResult | null> => {
+  // Only administrators may perform identification
+  if (callerRole !== 'administrator') {
+    throw new Error('Unauthorized: administrator role required to identify stripes');
+  }
   // Mock identification result when Supabase is not configured
   const mockResult = {
     tiger_id: 'IN-MP-045',
@@ -438,8 +443,13 @@ export const createTiger = async (
   name: string,
   stateCode: string = 'MP',
   leftFlankImage?: File | null,
-  rightFlankImage?: File | null
+  rightFlankImage?: File | null,
+  callerRole?: 'administrator' | 'user'
 ): Promise<Tiger | null> => {
+  // Only administrators may create new animal records
+  if (callerRole !== 'administrator') {
+    throw new Error('Unauthorized: administrator role required to create tigers');
+  }
   // When Supabase isn't configured return a mock object
   if (!isSupabaseConfigured()) {
     const generatedId = `IN-${stateCode}-${String(Math.floor(Date.now() % 1000)).padStart(3, '0')}`;
@@ -547,8 +557,12 @@ export const createElephant = async (
   name: string,
   stateCode: string = 'KA',
   leftImage?: File | null,
-  rightImage?: File | null
+  rightImage?: File | null,
+  callerRole?: 'administrator' | 'user'
 ): Promise<Elephant | null> => {
+  if (callerRole !== 'administrator') {
+    throw new Error('Unauthorized: administrator role required to create elephants');
+  }
   if (!isSupabaseConfigured()) {
     const generatedId = `IN-${stateCode}-${String(Math.floor(Date.now() % 1000)).padStart(3, '0')}`;
     return {

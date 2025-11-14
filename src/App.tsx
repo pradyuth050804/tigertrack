@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedAdmin from "./components/ProtectedAdmin";
 import Dashboard from "./pages/Dashboard";
 import Tigers from "./pages/Tigers";
 import Elephants from "./pages/Elephants";
@@ -22,6 +23,7 @@ import ElephantProfile from "./pages/ElephantProfile";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
+import Unauthorized from "./pages/Unauthorized";
 import React from "react";
 
 
@@ -59,13 +61,14 @@ const App = () => {
               <Route path="/map" element={<MapView />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/conflicts" element={<Conflicts />} />
-              <Route path="/stripe-identification" element={<StripeIdentification />} />
-              <Route path="/identify-new-tiger" element={<IdentifyNewTiger />} />
-              <Route path="/add-new-elephant" element={<AddNewElephant />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/stripe-identification" element={<ProtectedAdmin><StripeIdentification /></ProtectedAdmin>} />
+              <Route path="/identify-new-tiger" element={<ProtectedAdmin><IdentifyNewTiger /></ProtectedAdmin>} />
+              <Route path="/add-new-elephant" element={<ProtectedAdmin><AddNewElephant /></ProtectedAdmin>} />
+              <Route path="/settings" element={<ProtectedAdmin><Settings /></ProtectedAdmin>} />
               <Route path="/tigers/:id" element={<TigerProfile />} />
               <Route path="/elephants/:id" element={<ElephantProfile />} />
             </Route>
+            <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

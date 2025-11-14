@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { createElephant } from "@/lib/supabase-services";
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const AddNewElephant = () => {
@@ -17,6 +18,7 @@ const AddNewElephant = () => {
   const [stateCode, setStateCode] = useState<string>("KA");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleFileSelect = (file: File | null, side: 'left' | 'right') => {
     if (!file) return;
@@ -54,7 +56,7 @@ const AddNewElephant = () => {
     }
     setIsCreating(true);
     try {
-      const created = await createElephant(name, stateCode, leftImage, rightImage);
+  const created = await createElephant(name, stateCode, leftImage, rightImage, user?.role);
       if (created) {
         toast({ title: 'Elephant created', description: `Created ${created.id}` });
         navigate(`/elephants/${created.id}`);

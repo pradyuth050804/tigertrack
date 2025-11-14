@@ -15,6 +15,7 @@ import {
 import FilterBar from "@/components/FilterBar";
 import { useTigers } from "@/hooks/use-tigers";
 import type { FilterParams } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Tigers = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const Tigers = () => {
     ...filters,
     search: searchQuery || undefined,
   });
+  const { user } = useAuth();
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -52,10 +54,12 @@ const Tigers = () => {
           <h1 className="text-3xl font-bold tracking-tight mb-2">Tiger Records</h1>
           <p className="text-muted-foreground">Comprehensive tracking of all tigers across India</p>
         </div>
-        <Button className="gradient-tiger" onClick={() => navigate('/identify-new-tiger')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Identify New Tiger
-        </Button>
+        {user?.role === 'administrator' && (
+          <Button className="gradient-tiger" onClick={() => navigate('/identify-new-tiger')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Identify New Tiger
+          </Button>
+        )}
       </div>
 
       <FilterBar />
@@ -200,9 +204,11 @@ const Tigers = () => {
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" data-no-row-click onClick={(e) => e.stopPropagation()}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {user?.role === 'administrator' && (
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" data-no-row-click onClick={(e) => e.stopPropagation()}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

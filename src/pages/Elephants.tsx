@@ -15,6 +15,7 @@ import {
 import FilterBar from "@/components/FilterBar";
 import { useElephants } from "@/hooks/use-elephants";
 import type { FilterParams } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Elephants = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Elephants = () => {
     ...filters,
     search: searchQuery || undefined,
   });
-
+  const { user } = useAuth();
   const getSignalColor = (signal: string) => {
     const colors = {
       Strong: "text-secondary",
@@ -42,10 +43,12 @@ const Elephants = () => {
           <h1 className="text-3xl font-bold tracking-tight mb-2">Elephant Records</h1>
           <p className="text-muted-foreground">Comprehensive tracking of all elephants across India</p>
         </div>
-        <Button className="gradient-elephant" onClick={() => navigate('/add-new-elephant')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Elephant
-        </Button>
+        {user?.role === 'administrator' && (
+          <Button className="gradient-elephant" onClick={() => navigate('/add-new-elephant')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Elephant
+          </Button>
+        )}
       </div>
 
       <FilterBar />
@@ -206,12 +209,16 @@ const Elephants = () => {
                       <Button variant="ghost" size="icon" className="h-8 w-8" data-no-row-click onClick={(e) => e.stopPropagation()}>
                         <MapPin className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" data-no-row-click onClick={(e) => e.stopPropagation()}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" data-no-row-click onClick={(e) => e.stopPropagation()}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {user?.role === 'administrator' && (
+                        <>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" data-no-row-click onClick={(e) => e.stopPropagation()}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" data-no-row-click onClick={(e) => e.stopPropagation()}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
