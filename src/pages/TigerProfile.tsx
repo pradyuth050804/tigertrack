@@ -283,11 +283,11 @@ const TigerProfile = () => {
           onChange={() => {}}
         />
         <TabsList className="w-full flex gap-1 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
-          <TabsTrigger value="health" className="text-xs sm:text-sm">Health Status</TabsTrigger>
-          <TabsTrigger value="sightings" className="text-xs sm:text-sm">Sightings Info</TabsTrigger>
-          <TabsTrigger value="media" className="text-xs sm:text-sm">Media Reports</TabsTrigger>
-          <TabsTrigger value="others" className="text-xs sm:text-sm">Others</TabsTrigger>
-          <TabsTrigger value="location" className="text-xs sm:text-sm">Location</TabsTrigger>
+          <TabsTrigger value="health" className="flex-shrink-0 px-3 text-xs sm:text-sm whitespace-nowrap">Health Status</TabsTrigger>
+          <TabsTrigger value="sightings" className="flex-shrink-0 px-3 text-xs sm:text-sm whitespace-nowrap">Sightings Info</TabsTrigger>
+          <TabsTrigger value="media" className="flex-shrink-0 px-3 text-xs sm:text-sm whitespace-nowrap">Media Reports</TabsTrigger>
+          <TabsTrigger value="others" className="flex-shrink-0 px-3 text-xs sm:text-sm whitespace-nowrap">Others</TabsTrigger>
+          <TabsTrigger value="location" className="flex-shrink-0 px-3 text-xs sm:text-sm whitespace-nowrap">Location</TabsTrigger>
         </TabsList>
         
         {/* Health Status Tab */}
