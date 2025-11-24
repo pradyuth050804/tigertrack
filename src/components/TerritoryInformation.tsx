@@ -48,10 +48,10 @@ const TerritoryInformation = ({
             {/* Territory Boundary */}
             <div className="absolute inset-8 rounded-full border-2 border-dashed border-blue-400/60 dark:border-blue-600/60"></div>
 
-            {/* Center Tiger Icon */}
+            {/* Center Animal Icon */}
             <div className="absolute flex flex-col items-center">
               <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center shadow-lg">
-                <span className="text-xl">🐯</span>
+                <span className="text-xl">🐘</span>
               </div>
               <p className="text-xs font-semibold mt-2 text-foreground">Core Territory</p>
             </div>

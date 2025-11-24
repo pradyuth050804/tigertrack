@@ -1,5 +1,5 @@
 import { useState, useRef, ChangeEvent } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, MapPin, Activity, Heart, Scale, Clock, AlertTriangle, Image as ImageIcon, FileText, Zap, Upload, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTiger } from "@/hooks/use-tigers";
-import { useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import TerritoryInformation from "@/components/TerritoryInformation";
 
@@ -31,6 +30,7 @@ const TigerProfile = () => {
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeSide, setActiveSide] = useState<'left' | 'right'>('left');
+  const [activeTab, setActiveTab] = useState('health');
 
   console.log('TigerProfile - id:', id);
   console.log('TigerProfile - tiger:', tiger);
@@ -71,19 +71,16 @@ const TigerProfile = () => {
 
       {/* Header with Tiger Info */}
       <div className="space-y-4">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold tracking-tight">{tiger.name || tiger.id}</h1>
-              <Badge className="bg-secondary/20 text-secondary border-secondary/40">Alive</Badge>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-2xl font-bold tracking-tight">{tiger.name || tiger.id}</h1>
+              <Badge className={getStatusColor(tiger.status)}>{tiger.status}</Badge>
             </div>
             <p className="text-muted-foreground">
               {tiger.sex} • {tiger.age_class} • {tiger.reserve}
             </p>
           </div>
-          <Button variant="outline" size="sm">
-            Edit Tiger
-          </Button>
         </div>
 
         {/* Quick Info Cards */}
@@ -278,7 +275,13 @@ const TigerProfile = () => {
       </Card>
 
       {/* Tabbed Content */}
-      <Tabs defaultValue="health" className="w-full">
+      <Tabs defaultValue="health" className="w-full" value={activeTab} onValueChange={setActiveTab}>
+        <input
+          type="text"
+          className="hidden"
+          value={activeTab}
+          onChange={() => {}}
+        />
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="health" className="text-xs sm:text-sm">Health Status</TabsTrigger>
           <TabsTrigger value="sightings" className="text-xs sm:text-sm">Sightings Info</TabsTrigger>
@@ -286,7 +289,7 @@ const TigerProfile = () => {
           <TabsTrigger value="others" className="text-xs sm:text-sm">Others</TabsTrigger>
           <TabsTrigger value="location" className="text-xs sm:text-sm">Location</TabsTrigger>
         </TabsList>
-
+        
         {/* Health Status Tab */}
         <TabsContent value="health" className="space-y-6">
           <Card className="p-6 border-t-4 border-t-green-500">
@@ -498,36 +501,29 @@ const TigerProfile = () => {
             </div>
           </Card>
 
+        </TabsContent>
+
+        {/* Others Tab */}
+        <TabsContent value="others" className="space-y-6 pt-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Reference Images</h3>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center border-2 border-dashed">
-                <div className="text-center text-muted-foreground">
-                  <Image className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-xs">No Left Flank Image</p>
-                  <p className="text-xs mt-1 text-muted-foreground">Click to upload</p>
-                </div>
+            <h3 className="text-lg font-semibold mb-6">Additional Notes</h3>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  Notes
+                </label>
+                <textarea
+                  rows={4}
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  placeholder="Add any additional notes here..."
+                />
               </div>
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center border-2 border-dashed">
-                <div className="text-center text-muted-foreground">
-                  <Image className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-xs">No Right Flank Image</p>
-                  <p className="text-xs mt-1 text-muted-foreground">Click to upload</p>
-                </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button variant="outline" className="px-6">Cancel</Button>
+                <Button className="px-6 bg-blue-600 hover:bg-blue-700">Save Changes</Button>
               </div>
-            </div>
-            <div className="text-xs text-muted-foreground mb-4">
-              Available Years: 2025
-              <Select defaultValue="2025">
-                <SelectTrigger className="w-full mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </Card>
         </TabsContent>

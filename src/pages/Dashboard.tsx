@@ -142,56 +142,93 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <Select defaultValue="all-districts">
-            <SelectTrigger className="bg-muted/50">
-              <SelectValue placeholder="All Districts" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-districts">All Districts</SelectItem>
-              <SelectItem value="mysuru">Mysuru</SelectItem>
-              <SelectItem value="kodagu">Kodagu</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="all-reserves">
-            <SelectTrigger className="bg-muted/50">
-              <SelectValue placeholder="All Reserves" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-reserves">All Reserves</SelectItem>
-              <SelectItem value="bandipur">Bandipur</SelectItem>
-              <SelectItem value="nagarahole">Nagarahole</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="all-years">
-            <SelectTrigger className="bg-muted/50">
-              <SelectValue placeholder="All Years" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-years">All Years</SelectItem>
-              <SelectItem value="2025">2025</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="all-species">
-            <SelectTrigger className="bg-muted/50">
-              <SelectValue placeholder="All Species" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-species">All Species</SelectItem>
-              <SelectItem value="tiger">Tiger</SelectItem>
-              <SelectItem value="elephant">Elephant</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="all-status">
-            <SelectTrigger className="bg-muted/50">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-status">All Status</SelectItem>
-              <SelectItem value="collared">Collared</SelectItem>
-              <SelectItem value="monitoring">Monitoring</SelectItem>
-            </SelectContent>
-          </Select>
+          {/* District Filter */}
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground">District</p>
+            <Select defaultValue="all-districts">
+              <SelectTrigger className="bg-muted/50">
+                <SelectValue placeholder="All Districts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-districts">All Districts</SelectItem>
+                <SelectItem value="mysuru">Mysuru</SelectItem>
+                <SelectItem value="uttara-kannada">Uttara Kannada</SelectItem>
+                <SelectItem value="kodagu">Kodagu</SelectItem>
+                <SelectItem value="chamarajanagar">Chamarajanagar</SelectItem>
+                <SelectItem value="shivamogga">Shivamogga</SelectItem>
+                <SelectItem value="chikkamagaluru">Chikkamagaluru</SelectItem>
+                <SelectItem value="hassan">Hassan</SelectItem>
+                <SelectItem value="dakshina-kannada">Dakshina Kannada</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Reserve Filter */}
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground">Reserve</p>
+            <Select defaultValue="all-reserves">
+              <SelectTrigger className="bg-muted/50">
+                <SelectValue placeholder="All Reserves" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-reserves">All Reserves</SelectItem>
+                <SelectItem value="bandipur">Bandipur</SelectItem>
+                <SelectItem value="nagarahole">Nagarahole</SelectItem>
+                <SelectItem value="bhadra">Bhadra</SelectItem>
+                <SelectItem value="kali">Kali</SelectItem>
+                <SelectItem value="dandeli">Dandeli</SelectItem>
+                <SelectItem value="anshi">Anshi</SelectItem>
+                <SelectItem value="brt">BRT Wildlife Sanctuary</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sex Filter */}
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground">Sex</p>
+            <Select defaultValue="all-sex">
+              <SelectTrigger className="bg-muted/50">
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-sex">All</SelectItem>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="unknown">Unknown</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Age Class Filter */}
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground">Age Class</p>
+            <Select defaultValue="all-age">
+              <SelectTrigger className="bg-muted/50">
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-age">All</SelectItem>
+                <SelectItem value="cub">Cub</SelectItem>
+                <SelectItem value="sub-adult">Sub-adult</SelectItem>
+                <SelectItem value="adult">Adult</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Species Filter */}
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground">Species</p>
+            <Select defaultValue="all-species">
+              <SelectTrigger className="bg-muted/50">
+                <SelectValue placeholder="All Species" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-species">All Species</SelectItem>
+                <SelectItem value="tiger">Tiger</SelectItem>
+                <SelectItem value="elephant">Elephant</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </Card>
 

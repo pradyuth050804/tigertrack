@@ -37,11 +37,12 @@ const Elephants = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
   const getSignalColor = (signal: string) => {
     const colors = {
-      Strong: "text-secondary",
-      Medium: "text-warning",
-      Weak: "text-destructive",
+      Strong: "text-green-700",
+      Medium: "text-amber-700",
+      Weak: "text-red-700",
     };
     return colors[signal as keyof typeof colors] || "";
   };
@@ -154,7 +155,7 @@ const Elephants = () => {
                     <Link to={`/elephants/${elephant.id}`} className="block w-full h-full">
                       {elephant.collared ? (
                         <div className="text-sm">
-                          <Badge variant="outline" className="bg-secondary/20 text-secondary border-secondary/40">Collared</Badge>
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">Collared</Badge>
                           <div className="font-mono text-xs mt-1">{elephant.collar_id || "-"}</div>
                         </div>
                       ) : (
@@ -173,9 +174,9 @@ const Elephants = () => {
                       {elephant.battery !== null ? (
                         <div className="text-sm">
                           <span className="font-medium">{elephant.battery}%</span>
-                          <div className="h-1.5 w-16 bg-muted rounded-full mt-1 overflow-hidden">
+                          <div className="h-1.5 w-16 bg-blue-100 rounded-full mt-1 overflow-hidden">
                             <div
-                              className="h-full bg-secondary"
+                              className="h-full bg-blue-500"
                               style={{ width: `${elephant.battery}%` }}
                             />
                           </div>
@@ -201,7 +202,7 @@ const Elephants = () => {
                   </TableCell>
                   <TableCell>
                     <Link to={`/elephants/${elephant.id}`} className="block w-full h-full">
-                      <Badge variant="outline" className="bg-secondary/20 text-secondary border-secondary/40">
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
                         {elephant.status}
                       </Badge>
                     </Link>

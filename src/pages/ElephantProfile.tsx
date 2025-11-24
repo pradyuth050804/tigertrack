@@ -1,18 +1,9 @@
 import { useState, useRef, ChangeEvent } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, MapPin, Activity, Heart, Scale, Clock, AlertTriangle, Image as ImageIcon, FileText, Zap, Upload, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BackButton from "@/components/BackButton";
-  const getStatusColor = (status: string) => {
-    const colors = {
-      Alive: "bg-secondary/20 text-secondary border-secondary/40",
-      Monitoring: "bg-warning/10 text-warning border-warning/20",
-      Missing: "bg-destructive/10 text-destructive border-destructive/20",
-      Dead: "bg-muted text-muted-foreground border-muted",
-    };
-    return colors[status as keyof typeof colors] || colors.Alive;
-  };
-
+import TerritoryInformation from "@/components/TerritoryInformation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +15,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useElephant } from "@/hooks/use-elephants";
-import { useNavigate } from "react-router-dom";
+
+const getStatusColor = (status: string) => {
+  const colors = {
+    Alive: "bg-secondary/20 text-secondary border-secondary/40",
+    Monitoring: "bg-warning/10 text-warning border-warning/20",
+    Missing: "bg-destructive/10 text-destructive border-destructive/20",
+    Dead: "bg-muted text-muted-foreground border-muted",
+  };
+  return colors[status as keyof typeof colors] || colors.Alive;
+};
 
 const ElephantProfile = () => {
   const { id } = useParams();
@@ -69,19 +69,16 @@ const ElephantProfile = () => {
 
       {/* Header with Elephant Info */}
       <div className="space-y-4">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold tracking-tight">{elephant.name || elephant.id}</h1>
-              <Badge className={`${getStatusColor(elephant.status)}`}>{elephant.status}</Badge>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-2xl font-bold tracking-tight">{elephant.name || elephant.id}</h1>
+              <Badge className={getStatusColor(elephant.status)}>{elephant.status}</Badge>
             </div>
             <p className="text-muted-foreground">
               {elephant.sex} • {elephant.age_class} • {elephant.reserve}
             </p>
           </div>
-          <Button variant="outline" size="sm">
-            Edit Elephant
-          </Button>
         </div>
 
         {/* Quick Info Cards */}
@@ -390,7 +387,7 @@ const ElephantProfile = () => {
         </TabsContent>
 
         {/* Others Tab */}
-        <TabsContent value="others" className="space-y-6">
+        <TabsContent value="others" className="space-y-6 pt-6">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">General Information</h3>
             <div className="space-y-4">
@@ -438,54 +435,43 @@ const ElephantProfile = () => {
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Herd Information</h3>
+            <h3 className="text-lg font-semibold mb-4">Lineage Information</h3>
             <div className="space-y-4">
               <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
-                <p className="text-sm font-semibold text-purple-900 dark:text-purple-100 mb-2">Herd Size</p>
-                <p className="text-sm text-purple-800 dark:text-purple-200">8 members including 3 juveniles</p>
+                <p className="text-sm font-semibold text-purple-900 dark:text-purple-100 mb-2">Mother</p>
+                <p className="text-sm text-purple-800 dark:text-purple-200">No mother information recorded</p>
               </div>
               <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
-                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Role in Herd</p>
-                <p className="text-sm text-blue-800 dark:text-blue-200">Matriarch - Leader and guide for the entire herd</p>
+                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Father</p>
+                <p className="text-sm text-blue-800 dark:text-blue-200">No father information recorded</p>
               </div>
               <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
                 <p className="text-xs text-amber-800 dark:text-amber-200 italic">
-                  ℹ️ Tip: Monitoring herd dynamics helps understand social structures and conservation needs for elephant populations.
+                  ℹ️ Tip: Tracking lineage helps in understanding genetic diversity and breeding patterns in elephant populations.
                 </p>
               </div>
             </div>
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Reference Images</h3>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center border-2 border-dashed">
-                <div className="text-center text-muted-foreground">
-                  <Image className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-xs">No Left Side Image</p>
-                  <p className="text-xs mt-1 text-muted-foreground">Click to upload</p>
-                </div>
+            <h3 className="text-lg font-semibold mb-6">Additional Notes</h3>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  Notes
+                </label>
+                <textarea
+                  rows={4}
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  placeholder="Add any additional notes here..."
+                />
               </div>
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center border-2 border-dashed">
-                <div className="text-center text-muted-foreground">
-                  <Image className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-xs">No Right Side Image</p>
-                  <p className="text-xs mt-1 text-muted-foreground">Click to upload</p>
-                </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button variant="outline" className="px-6">Cancel</Button>
+                <Button className="px-6 bg-green-600 hover:bg-green-700">Save Changes</Button>
               </div>
-            </div>
-            <div className="text-xs text-muted-foreground mb-4">
-              Available Years: 2025
-              <Select defaultValue="2025">
-                <SelectTrigger className="w-full mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </Card>
         </TabsContent>
@@ -542,6 +528,15 @@ const ElephantProfile = () => {
               Open in Google Maps
             </Button>
           </Card>
+          {/* Territory Information Section */}
+          <div className="pt-6 border-t">
+            <TerritoryInformation
+              primaryReserve={elephant.reserve || "Bandipur"}
+              district={elephant.district || "Mysuru"}
+              territoryRange="110.50 sq. km"
+              recentSightings={2}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -6,15 +6,6 @@ interface FilterBarProps {
   onReset?: () => void;
 }
 
-const indianStates = [
-  "All States",
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
-];
-
 const FilterBar = ({ onReset }: FilterBarProps) => {
   return (
     <div className="flex flex-wrap items-center gap-4 p-4 bg-card/50 backdrop-blur-xl rounded-lg border border-border">
@@ -23,54 +14,78 @@ const FilterBar = ({ onReset }: FilterBarProps) => {
         <span className="text-sm font-medium">Filters:</span>
       </div>
 
-      <Select defaultValue="all-states">
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select State" />
-        </SelectTrigger>
-        <SelectContent>
-          {indianStates.map((state) => (
-            <SelectItem key={state} value={state.toLowerCase().replace(/\s+/g, "-")}>
-              {state}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {/* District */}
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-muted-foreground">District</p>
+        <Select defaultValue="all-districts">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Districts" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all-districts">All Districts</SelectItem>
+            <SelectItem value="mysuru">Mysuru</SelectItem>
+            <SelectItem value="uttara-kannada">Uttara Kannada</SelectItem>
+            <SelectItem value="kodagu">Kodagu</SelectItem>
+            <SelectItem value="chamarajanagar">Chamarajanagar</SelectItem>
+            <SelectItem value="shivamogga">Shivamogga</SelectItem>
+            <SelectItem value="chikkamagaluru">Chikkamagaluru</SelectItem>
+            <SelectItem value="hassan">Hassan</SelectItem>
+            <SelectItem value="dakshina-kannada">Dakshina Kannada</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select defaultValue="all-species">
-        <SelectTrigger className="w-[150px]">
-          <SelectValue placeholder="Species" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all-species">All Species</SelectItem>
-          <SelectItem value="tiger">Tiger</SelectItem>
-          <SelectItem value="elephant">Elephant</SelectItem>
-        </SelectContent>
-      </Select>
+      {/* Reserve */}
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-muted-foreground">Reserve</p>
+        <Select defaultValue="all-reserves">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Reserves" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all-reserves">All Reserves</SelectItem>
+            <SelectItem value="bandipur">Bandipur</SelectItem>
+            <SelectItem value="nagarahole">Nagarahole</SelectItem>
+            <SelectItem value="bhadra">Bhadra</SelectItem>
+            <SelectItem value="kali">Kali</SelectItem>
+            <SelectItem value="dandeli">Dandeli</SelectItem>
+            <SelectItem value="anshi">Anshi</SelectItem>
+            <SelectItem value="brt">BRT Wildlife Sanctuary</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select defaultValue="2024">
-        <SelectTrigger className="w-[120px]">
-          <SelectValue placeholder="Year" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="2024">2024</SelectItem>
-          <SelectItem value="2023">2023</SelectItem>
-          <SelectItem value="2022">2022</SelectItem>
-          <SelectItem value="2021">2021</SelectItem>
-        </SelectContent>
-      </Select>
+      {/* Sex */}
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-muted-foreground">Sex</p>
+        <Select defaultValue="all-sex">
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all-sex">All</SelectItem>
+            <SelectItem value="male">Male</SelectItem>
+            <SelectItem value="female">Female</SelectItem>
+            <SelectItem value="unknown">Unknown</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select defaultValue="all-status">
-        <SelectTrigger className="w-[140px]">
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all-status">All Status</SelectItem>
-          <SelectItem value="alive">Alive</SelectItem>
-          <SelectItem value="monitoring">Monitoring</SelectItem>
-          <SelectItem value="missing">Missing</SelectItem>
-          <SelectItem value="dead">Dead</SelectItem>
-        </SelectContent>
-      </Select>
+      {/* Age Class */}
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-muted-foreground">Age Class</p>
+        <Select defaultValue="all-age">
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all-age">All</SelectItem>
+            <SelectItem value="cub">Cub</SelectItem>
+            <SelectItem value="sub-adult">Sub-adult</SelectItem>
+            <SelectItem value="adult">Adult</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <Button
         variant="outline"

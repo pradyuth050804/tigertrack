@@ -35,9 +35,9 @@ const Tigers = () => {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      Alive: "bg-secondary/10 text-secondary border-secondary/20",
-      Monitoring: "bg-warning/10 text-warning border-warning/20",
-      Missing: "bg-destructive/10 text-destructive border-destructive/20",
+      Alive: "bg-green-50 text-green-700 border-green-300",
+      Monitoring: "bg-amber-50 text-amber-700 border-amber-300",
+      Missing: "bg-red-50 text-red-700 border-red-300",
       Dead: "bg-muted text-muted-foreground border-muted",
     };
     return colors[status as keyof typeof colors] || colors.Alive;
@@ -45,9 +45,9 @@ const Tigers = () => {
 
   const getSignalColor = (signal: string) => {
     const colors = {
-      Strong: "text-secondary",
-      Medium: "text-warning",
-      Weak: "text-destructive",
+      Strong: "text-green-700",
+      Medium: "text-amber-700",
+      Weak: "text-red-700",
     };
     return colors[signal as keyof typeof colors] || "";
   };
