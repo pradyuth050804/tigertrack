@@ -7,10 +7,13 @@ import { useConflicts } from "@/hooks/use-conflicts";
 import { useState } from "react";
 import type { FilterParams } from "@/types";
 import BackButton from "@/components/BackButton";
+import { useNavigate } from "react-router-dom";
+import AddConflictDialog from "@/components/AddConflictDialog";
 
 const Conflicts = () => {
   const [filters, setFilters] = useState<FilterParams>({});
   const { data: conflicts = [], isLoading, error } = useConflicts(filters);
+  const navigate = useNavigate();
 
   const getSeverityColor = (severity: string) => {
     const colors = {
@@ -38,6 +41,7 @@ const Conflicts = () => {
           <h1 className="text-3xl font-bold tracking-tight mb-2">Conflicts</h1>
           <p className="text-muted-foreground">Human-wildlife conflict tracking and management</p>
         </div>
+        <AddConflictDialog existingConflicts={conflicts} />
       </div>
 
       <FilterBar />
@@ -88,55 +92,55 @@ const Conflicts = () => {
           </Card>
         ) : (
           conflicts.map((conflict) => (
-          <Card key={conflict.id} className="glass-card p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <span className="font-mono font-semibold">{conflict.id}</span>
-                  <Badge className={getSeverityColor(conflict.severity)} variant="outline">
-                    {conflict.severity} Severity
-                  </Badge>
-                  <Badge className={getStatusColor(conflict.status)} variant="outline">
-                    {conflict.status}
-                  </Badge>
+            <Card key={conflict.id} className="glass-card p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono font-semibold">{conflict.id}</span>
+                    <Badge className={getSeverityColor(conflict.severity)} variant="outline">
+                      {conflict.severity} Severity
+                    </Badge>
+                    <Badge className={getStatusColor(conflict.status)} variant="outline">
+                      {conflict.status}
+                    </Badge>
+                  </div>
+                  <h3 className="text-xl font-semibold">{conflict.type}</h3>
                 </div>
-                <h3 className="text-xl font-semibold">{conflict.type}</h3>
-              </div>
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                View Details
-              </Button>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Species Involved</p>
-                <p className="font-medium">
-                  {conflict.species === "Tiger" ? "🐅" : "🐘"} {conflict.species}
-                </p>
-                <p className="text-sm text-muted-foreground">{conflict.animal_id || "-"}</p>
+                <Button variant="outline" size="sm" onClick={() => navigate(`/conflicts/${conflict.id}`)}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Details
+                </Button>
               </div>
 
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <MapPin className="h-3 w-3" /> Location
-                </p>
-                <p className="font-medium text-sm">{conflict.location}</p>
-              </div>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Species Involved</p>
+                  <p className="font-medium">
+                    {conflict.species === "Tiger" ? "🐅" : "🐘"} {conflict.species}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{conflict.animal_id || "-"}</p>
+                </div>
 
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Calendar className="h-3 w-3" /> Date
-                </p>
-                <p className="font-medium">{conflict.date}</p>
-              </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <MapPin className="h-3 w-3" /> Location
+                  </p>
+                  <p className="font-medium text-sm">{conflict.location}</p>
+                </div>
 
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Casualties</p>
-                <p className="font-medium">{conflict.casualties || "None"}</p>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Calendar className="h-3 w-3" /> Date
+                  </p>
+                  <p className="font-medium">{conflict.date}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Casualties</p>
+                  <p className="font-medium">{conflict.casualties || "None"}</p>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
           ))
         )}
       </div>

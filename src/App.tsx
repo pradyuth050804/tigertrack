@@ -14,6 +14,7 @@ import Elephants from "./pages/Elephants";
 import MapView from "./pages/MapView";
 import Analytics from "./pages/Analytics";
 import Conflicts from "./pages/Conflicts";
+import ConflictDetail from "./pages/ConflictDetail";
 import Settings from "./pages/Settings";
 import StripeIdentification from "./pages/StripeIdentification";
 import IdentifyNewTiger from "./pages/IdentifyNewTiger";
@@ -39,45 +40,46 @@ const App = () => {
   }, []);
 
   return (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route
-              element={
-                <ProtectedRoute>
-                  <Layout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/tigers" element={<Tigers />} />
-              <Route path="/elephants" element={<Elephants />} />
-              <Route path="/map" element={<MapView />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/conflicts" element={<Conflicts />} />
-              <Route path="/stripe-identification" element={<ProtectedAdmin><StripeIdentification /></ProtectedAdmin>} />
-              <Route path="/identify-new-tiger" element={<ProtectedAdmin><IdentifyNewTiger /></ProtectedAdmin>} />
-              <Route path="/add-new-elephant" element={<ProtectedAdmin><AddNewElephant /></ProtectedAdmin>} />
-              <Route path="/settings" element={<ProtectedAdmin><Settings /></ProtectedAdmin>} />
-              <Route path="/tigers/:id" element={<TigerProfile />} />
-              <Route path="/elephants/:id" element={<ElephantProfile />} />
-              <Route path="/elephants/:id/edit" element={<ProtectedAdmin><React.Suspense fallback={<div>Loading...</div>}><EditElephant /></React.Suspense></ProtectedAdmin>} />
-            </Route>
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route
+                  element={
+                    <ProtectedRoute>
+                      <Layout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/tigers" element={<Tigers />} />
+                  <Route path="/elephants" element={<Elephants />} />
+                  <Route path="/map" element={<MapView />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/conflicts" element={<Conflicts />} />
+                  <Route path="/conflicts/:id" element={<ConflictDetail />} />
+                  <Route path="/stripe-identification" element={<ProtectedAdmin><StripeIdentification /></ProtectedAdmin>} />
+                  <Route path="/identify-new-tiger" element={<ProtectedAdmin><IdentifyNewTiger /></ProtectedAdmin>} />
+                  <Route path="/add-new-elephant" element={<ProtectedAdmin><AddNewElephant /></ProtectedAdmin>} />
+                  <Route path="/settings" element={<ProtectedAdmin><Settings /></ProtectedAdmin>} />
+                  <Route path="/tigers/:id" element={<TigerProfile />} />
+                  <Route path="/elephants/:id" element={<ElephantProfile />} />
+                  <Route path="/elephants/:id/edit" element={<ProtectedAdmin><React.Suspense fallback={<div>Loading...</div>}><EditElephant /></React.Suspense></ProtectedAdmin>} />
+                </Route>
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
 
